@@ -16,12 +16,20 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const servicesCollection = client.db('CloudKitchen').collection('services');
+        const AllservicesCollection = client.db('CloudKitchen').collection('Allservices');
         // home page
         app.get('/services', async (req, res) => {
             const query = {}
             const cursor = servicesCollection.find(query);
             const services = await cursor.limit(3).toArray()
             res.send(services)
+        })
+        // service routes 
+        app.get('/Allservices', async (req, res) => {
+            const query = {}
+            const cursor = servicesCollection.find(query);
+            const AllServices = await cursor.toArray()
+            res.send(AllServices)
         })
         // get data by id
         app.get('/services/:id', async (req, res) => {

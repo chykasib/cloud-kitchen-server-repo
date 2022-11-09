@@ -17,6 +17,7 @@ async function run() {
     try {
         const servicesCollection = client.db('CloudKitchen').collection('services');
         const allServicesCollection = client.db('CloudKitchen').collection('Allservices');
+        const reviewsCollection = client.db('CloudKitchen').collection('reviews')
         // home page
         app.get('/services', async (req, res) => {
             const query = {}
@@ -37,6 +38,13 @@ async function run() {
             const query = { _id: ObjectId(id) }
             const service = await servicesCollection.findOne(query);
             res.send(service)
+        })
+
+        //review api
+        app.post('/reviews', async(req,res) =>{
+            const reviews = req.body;
+            const result = await reviewsCollection.insertOne(reviews);
+            res.send(result);
         })
 
     }

@@ -16,7 +16,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const servicesCollection = client.db('CloudKitchen').collection('services');
-        const allServicesCollection = client.db('CloudKitchen').collection('Allservices');
+        const allServicesCollection = client.db('CloudKitchen').collection('AllServices');
         const reviewsCollection = client.db('CloudKitchen').collection('reviews')
         // home page
         app.get('/services', async (req, res) => {
@@ -47,6 +47,13 @@ async function run() {
             res.send(result);
         })
 
+        //addservices api
+        app.post('/AllServices', async(req,res) =>{
+            const addService = req.body;
+            const result = await allServicesCollection.insertOne(addService);
+            res.send(result);
+        })
+ 
         // get reviews data
         app.get('/reviews', async(req, res)=>{
             let query = {}
@@ -59,6 +66,14 @@ async function run() {
             const reviews = await cursor.toArray()
             res.send(reviews)
         })
+
+
+        // app.get('/reviews/:id', async(req, res)=>{
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) }
+        //     const review = await reviewsCollection.findOne(query);
+        //     res.send(review )
+        // })
         // Delete reviews data
         app.delete('/reviews/:id', async(req,res) =>{
             const id = req.params.id;
@@ -72,14 +87,15 @@ async function run() {
             const id = req.params.id;
             const filter = {_id: ObjectId(id)}
             const review = req.body;
-            const option = {upsert: true}
-            const updateReview = {
-                $set: {
-                  reviewItem: reviews.review
-                },
-              };
-            const result = await reviewsCollection.updateOne(filter, updateReview, options);
-            res.send(result);
+            console.log(review)
+            // const option = {upsert: true}
+            // const updateReview = {
+            //     $set: {
+            //       reviewItem: reviews.review
+            //     },
+            //   };
+            // const result = await reviewsCollection.updateOne(filter, updateReview, options);
+            // res.send(result);
         })
 
 

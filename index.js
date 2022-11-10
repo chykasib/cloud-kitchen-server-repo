@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-var jwt = require('jsonwebtoken');
+// var jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const cors = require('cors')
 require('dotenv').config()
@@ -9,20 +9,20 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.use(cors())
 app.use(express.json())
 
-function verifyJwt(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).send({ message: 'unauthorized access' })
-    }
-    const token = authHeader.split(' ')[1]
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            return res.status(403).send({ message: 'Forbidden access' })
-        }
-        req.decoded = decoded;
-        next()
-    });
-}
+// function verifyJwt(req, res, next) {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader) {
+//         return res.status(401).send({ message: 'unauthorized access' })
+//     }
+//     const token = authHeader.split(' ')[1]
+//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+//         if (err) {
+//             return res.status(403).send({ message: 'Forbidden access' })
+//         }
+//         req.decoded = decoded;
+//         next()
+//     });
+// }
 const uri = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@cluster0.rx4i6uo.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
@@ -32,13 +32,13 @@ async function run() {
         const reviewsCollection = client.db('CloudKitchen').collection('reviews')
         // jwt 
 
-        app.post('/jwt', (req, res) => {
-            const user = req.body;
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: "7d"
-            });
-            res.send({ token })
-        })
+        // app.post('/jwt', (req, res) => {
+        //     const user = req.body;
+        //     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        //         expiresIn: "2 days"
+        //     });
+        //     res.send({ token })
+        // })
         // home page
         app.get('/services', async (req, res) => {
             const query = {}
@@ -63,11 +63,11 @@ async function run() {
 
         //review api
         app.post('/reviews', async (req, res) => {
-            const decoded = req.decoded;
-            if (decoded.email !== req.query.email) {
-                res.status(403).send({ message: 'forbidden access' })
-            }
-            let query = {}
+            // const decoded = req.decoded;
+            // if (decoded.email !== req.query.email) {
+            //     res.status(403).send({ message: 'forbidden access' })
+            // }
+            // let query = {}
             if (req.query.email) {
                 query = {
                     email: req.query.email
@@ -86,7 +86,7 @@ async function run() {
         })
 
         // get reviews data
-        app.get('/reviews', verifyJwt, async (req, res) => {
+        app.get('/reviews', async (req, res) => {
             let query = {}
             if (req.query.email) {
                 query = {
@@ -99,14 +99,14 @@ async function run() {
         })
 
 
-        app.get('/reviews/:id', verifyJwt, async (req, res) => {
+        app.get('/reviews/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const review = await reviewsCollection.findOne(query);
             res.send(review)
         })
         // Delete reviews data
-        app.delete('/reviews/:id', verifyJwt, async (req, res) => {
+        app.delete('/reviews/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const result = await reviewsCollection.deleteOne(query);
